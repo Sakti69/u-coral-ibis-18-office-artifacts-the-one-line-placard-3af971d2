@@ -22,6 +22,10 @@ to the output:
      cuts the repeats by elision after the semicolons ("two, a treaty;
      three, ...") and swaps the flat ending for "a war nobody
      remembers", so the line turns earlier and lands harder.
+     REVISED again after the first check run: the gate limit is now a
+     named MAX_CHARS constant and main() also rejects stray leading /
+     trailing whitespace, so a future edit cannot silently break the
+     1-180 gate. The shipped line itself is unchanged (147 chars).
   B (cut): the sticky note. "Both fell off, forgotten together" is a
      decent last line, but the conceit is thin — a note falling off a
      wall is just what sticky notes do, not a surprising imagined
@@ -33,6 +37,8 @@ to the output:
 """
 
 import os
+
+MAX_CHARS = 180  # the competition gate: 1-180 characters
 
 PLACARD = (
     "Stapler, c. 2140 BCE. Bronze and steel, gift of the Bureau of "
@@ -56,7 +62,9 @@ CANDIDATE_C = (
 def main() -> None:
     text = PLACARD
     assert "\n" not in text, "placard must be a single line"
-    assert 1 <= len(text) <= 180, f"placard is {len(text)} characters"
+    assert text == text.strip(), "placard must not carry stray whitespace"
+    assert 1 <= len(text) <= MAX_CHARS, (
+        f"placard is {len(text)} characters, limit {MAX_CHARS}")
     assert text.strip(), "placard must not be only whitespace"
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     os.makedirs(out_dir, exist_ok=True)
